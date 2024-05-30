@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amazon-deployment
+  labels:
+    app: amazon
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: amazon
+  template:
+    metadata:
+      labels:
+        app: amazon
+    spec:
+      containers:
+      - name: amazon-container
+        image: henrykum23/amazon:latest
+        ports:
+        - containerPort: 8080
+        # livenessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8080
+        #   initialDelaySeconds: 6
+        #   timeoutSeconds: 1
+        #   periodSeconds: 5
+        #   successThreshold: 1
+        #   failureThreshold: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amazon-service
+spec:
+  selector:
+    app.kubernetes.io/name: amazon
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
