@@ -5,7 +5,7 @@ metadata:
   labels:
     app: amazon
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: amazon
@@ -35,9 +35,27 @@ metadata:
   name: amazon-service
 spec:
   selector:
-    app.kubernetes.io/name: amazon
+    app: amazon
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8080
-  type: ClusterIP
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: amazon-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: amazon-service
+                port:
+                  number: 80
